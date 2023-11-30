@@ -16,6 +16,10 @@ DEFAULT_RESTING_VOLTAGE = -70
 DEFAULT_MEMBRANE_CAPACITANCE = 2
 DEFAULT_MEMBRANE_RESISTANCE = 4
 
+# Simulation duration in ms
+DEFAULT_SIMULATION_DURATION = 100
+DEFAULT_RESOLUTION = 10
+
 def visualize_custom_lif(membrane_v, timepoints, step_current):
     # Getting color visualization
     membrane_v = list(membrane_v)
@@ -77,16 +81,43 @@ class LIFSimulation:
         return (intracellular_color_v, extracellular_color_v)
 
     @staticmethod
-    def simulate(threshold_voltage):
+    def simulate(
+        threshold_v=DEFAULT_THRESHOLD_VOLTAGE,
+        resting_v=DEFAULT_RESTING_VOLTAGE,
+        membrane_c=DEFAULT_MEMBRANE_CAPACITANCE,
+        membrane_r=DEFAULT_MEMBRANE_RESISTANCE,
+        simulation_duration=DEFAULT_SIMULATION_DURATION,
+        resolution=DEFAULT_RESOLUTION,
+        pulses=[]
+    ):
         """
         Runs LIF model simulation given the following data:
             - Threshold voltage (mV)
             - Resting voltage (mV)
-            - Initial voltage (mV)
             - Membrane capacitance (Microfarads)
             - Membrane resistance (Ohms)
             - Pulses object
         """
+        num_points = simulation_duration * resolution
+        current_vec = np.zeros(num_points)
+        time_vec = np.zeros(num_points)
+        membrance_v_vec = np.zeros(num_points)
+
+        for pulse in pulses:
+            pulse_start = pulse["start"]
+            pulse_end = pulse["end"]
+            pulse_amplitude = pulse["amp"]
+
+            # Determining indices to apply pulse
+            pulse_start_idx = pulse_start * resolution
+            pulse_end_idx = pulse_end * resolution
+            pulse_app_indices = [range(pulse_start_idx, pulse_end_idx + 1)]
+            pulse_vec = np.zeros(len(pulse_app_indices))
+            pulse_vec.fill(pulse_amplitude)
+            np.put(current_vec, pulse_app_indices, pulse_vec)
+
+        print(current_vec)
+
 
         # simulation_results = {
         #     "membrane_voltage": list(soma_v),

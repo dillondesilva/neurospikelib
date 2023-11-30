@@ -33,7 +33,6 @@ def visualize_custom_lif(membrane_v, timepoints, step_current):
         "timepoints": timepoints,
         "stim_pulse_train": list(stim_pulse_train)
     }
-    print(simulation_results)
 
     sys.stdout.write(json.dumps(simulation_results))
 

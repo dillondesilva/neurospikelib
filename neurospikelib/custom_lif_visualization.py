@@ -7,7 +7,7 @@
 ## Import packages and specify some settings ##
 ###############################################
 # Import packages
-from lif import visualize_custom_lif
+from neurospikelib.lif import visualize_custom_lif
 import numpy as np
 
 ###############################################

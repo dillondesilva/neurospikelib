@@ -1,10 +1,41 @@
 from neuron import h
 from neuron.units import mV, ms
-from scipy.special import expit
 
 import numpy as np 
 import sys
 import json
+
+DEFAULT_NUM_TIMEPOINTS = 101
+DEFAULT_NUM_VOLTAGE_POINTS = 101
+
+def visualize_custom_lif(membrane_v, timepoints, step_current):
+    # Getting color visualization
+    membrane_v = list(membrane_v)
+    timepoints = list(timepoints)
+
+    min_v = np.min(membrane_v)
+    max_v = np.max(membrane_v)
+    reshaped_membrane_v = np.reshape(membrane_v, (len(membrane_v), 1))
+    normalized_v_data = ((reshaped_membrane_v - min_v) / (max_v - min_v))
+
+    intracellular_color_v, extracellular_color_v = LIFSimulation.create_visualization_data(normalized_v_data)
+    stim_pulse_train = []
+    for i in step_current:
+        if i > 0:
+            stim_pulse_train.append(1)
+        else:
+            stim_pulse_train.append(0)
+
+    simulation_results = {
+        "membrane_voltage": membrane_v,
+        "intracellular_color_v": intracellular_color_v.tolist(),
+        "extracellular_color_v": extracellular_color_v.tolist(),
+        "timepoints": timepoints,
+        "stim_pulse_train": list(stim_pulse_train)
+    }
+    print(simulation_results)
+
+    sys.stdout.write(json.dumps(simulation_results))
 
 class LIFSimulation:
     '''
@@ -24,7 +55,9 @@ class LIFSimulation:
         normalized_values = expit(time_series)
         return normalized_values
 
-    def __create_visualization_data(self, normalized_v_data, base_color=(132, 215, 206), final_color=(238,129,238)):
+    @staticmethod
+    def create_visualization_data(normalized_v_data, base_color=(132, 215, 206), final_color=(238,129,238)):
+        '''Calculate colors to create visualization for LIF simulation'''
         base_color_v = np.array(base_color)
         final_color_v = np.array(final_color)
 
@@ -38,6 +71,7 @@ class LIFSimulation:
 
     def simulate(self):
         '''Runs LIF model simulation by given parameters'''
+        # Initialize time vector and membrane voltage vector
         # Create soma-only neuron model with passive
         # leak channels for membrane
         soma = h.Section(name="soma")
@@ -67,7 +101,7 @@ class LIFSimulation:
         max_v = np.max(list(soma_v))
 
         normalized_v_data = ((reshaped_soma_v - min_v) / (max_v - min_v))
-        intracellular_color_v, extracellular_color_v = self.__create_visualization_data(normalized_v_data)
+        intracellular_color_v, extracellular_color_v = LIFSimulation.create_visualization_data(normalized_v_data)
 
         # Pulse train for stimulation
         stim_pulse_train = []

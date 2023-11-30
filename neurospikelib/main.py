@@ -1,5 +1,5 @@
 from lif import LIFSimulation
-
+import matplotlib.pyplot as plt
 if __name__ == "__main__":
     # Run sample LIF simulation
     neuron_parameters = {

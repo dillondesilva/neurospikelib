@@ -8,6 +8,13 @@ from neuron.units import ms, mV
 DEFAULT_NUM_TIMEPOINTS = 101
 DEFAULT_NUM_VOLTAGE_POINTS = 101
 
+# Default voltages are in mV
+DEFAULT_THRESHOLD_VOLTAGE = -55
+DEFAULT_RESTING_VOLTAGE = -70
+
+# Capacitance and Ohms in microfarads and ohms respectively
+DEFAULT_MEMBRANE_CAPACITANCE = 2
+DEFAULT_MEMBRANE_RESISTANCE = 4
 
 def visualize_custom_lif(membrane_v, timepoints, step_current):
     # Getting color visualization
@@ -73,10 +80,12 @@ class LIFSimulation:
     def simulate(threshold_voltage):
         """
         Runs LIF model simulation given the following data:
-            - Threshold voltage
-            - Membrane capacitance
-            - Membrane resistance
-            -
+            - Threshold voltage (mV)
+            - Resting voltage (mV)
+            - Initial voltage (mV)
+            - Membrane capacitance (Microfarads)
+            - Membrane resistance (Ohms)
+            - Pulses object
         """
 
         # simulation_results = {

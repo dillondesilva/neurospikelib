@@ -1,11 +1,11 @@
 from lif_new import LIFSimulation
 
 LIFSimulation.simulate(pulses=[{
-    "start": 20,
-    "end": 30,
-    "amp": 10
+    "start": 10,
+    "end": 20,
+    "amp": 3
 }, {
     "start": 40,
-    "end": 50,
-    "amp": 20   
-}], resolution=1)
+    "end": 80,
+    "amp": 5
+}], membrane_c=1)

@@ -4,6 +4,7 @@ import sys
 import numpy as np
 from neuron import h
 from neuron.units import ms, mV
+import matplotlib.pyplot as plt
 
 DEFAULT_NUM_TIMEPOINTS = 101
 DEFAULT_NUM_VOLTAGE_POINTS = 101
@@ -100,8 +101,12 @@ class LIFSimulation:
         """
         num_points = simulation_duration * resolution
         current_vec = np.zeros(num_points)
-        time_vec = np.zeros(num_points)
-        membrance_v_vec = np.zeros(num_points)
+        membrane_v_vec = np.zeros(num_points)
+        membrane_v_vec[0] = resting_v
+        dt = (simulation_duration / (num_points - 1))
+        time_vec = np.linspace(0, simulation_duration, num_points)
+        v_peak = threshold_v + 100
+        v_reset = resting_v
 
         for pulse in pulses:
             pulse_start = pulse["start"]
@@ -116,15 +121,15 @@ class LIFSimulation:
             pulse_vec.fill(pulse_amplitude)
             np.put(current_vec, pulse_app_indices, pulse_vec)
 
-        print(current_vec)
+        # Determining time constant
+        tau = membrane_r * membrane_c
 
+        # Forward Euler solver
+        for i in range(len(membrane_v_vec) - 1):
+            membrane_v_vec[i + 1] = ((dt/tau) * ((resting_v - membrane_v_vec[i]) + (membrane_r * current_vec[i]))) + membrane_v_vec[i]
+            # Handle spiking
+            if membrane_v_vec[i] >= threshold_v:
+                membrane_v_vec[i + 1] = v_reset
 
-        # simulation_results = {
-        #     "membrane_voltage": list(soma_v),
-        #     "intracellular_color_v": intracellular_color_v.tolist(),
-        #     "extracellular_color_v": extracellular_color_v.tolist(),
-        #     "timepoints": list(time),
-        #     "stim_pulse_train": list(stim_pulse_train)
-        # }
-
-        # sys.stdout.write(json.dumps(simulation_results))
+        plt.plot(time_vec, membrane_v_vec.tolist())
+        plt.show()
